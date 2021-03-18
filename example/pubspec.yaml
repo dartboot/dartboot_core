@@ -1,0 +1,11 @@
+name: example
+description: The core library for DartBoot framework. https://github.com/luodongseu/dartboot
+# version: 1.0.0
+# homepage: https://github.com/luodongseu/dartboot-core
+
+environment:
+  sdk: '>=2.10.0 <3.0.0'
+
+dev_dependencies:
+  dartboot_core:
+    path: ../
