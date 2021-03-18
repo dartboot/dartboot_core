@@ -1,7 +1,4 @@
-A library for Dart developers.
-
-Created from templates made available by Stagehand under a BSD-style
-[license](https://github.com/dart-lang/stagehand/blob/master/LICENSE).
+The core library for DartBoot cloud.
 
 ## Usage
 
@@ -10,13 +7,11 @@ A simple usage example:
 ```dart
 import 'package:dartboot_core/dartboot_core.dart';
 
-main() {
-  var awesome = new Awesome();
+void main(args) {
+  DartBootApplication.run(args: args);
 }
 ```
 
 ## Features and bugs
 
 Please file feature requests and bugs at the [issue tracker][tracker].
-
-[tracker]: http://example.com/issues/replaceme
