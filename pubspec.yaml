@@ -1,12 +1,14 @@
 name: dartboot_core
 description: The core library for DartBoot framework. https://github.com/luodongseu/dartboot.
-version: 1.0.2
+version: 1.0.9
 homepage: https://github.com/luodongseu/dartboot_core
 
 environment:
   sdk: '>=2.10.0 <3.0.0'
 
 dependencies:
+  dartboot_annotation: ^1.0.0
+  dartboot_util: ^1.0.0
   dio: ^3.0.10
   uuid: ^2.2.2
   mutex: ^1.1.0

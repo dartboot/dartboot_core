@@ -1,10 +1,10 @@
 import 'dart:async';
 
+import 'package:dartboot_util/dartboot_util.dart';
 import 'package:dio/dio.dart';
 
 import '../error/custom_error.dart';
 import '../log/logger.dart';
-import '../util/string.dart';
 import 'client.dart';
 import 'instance.dart';
 import 'load_balancer.dart';

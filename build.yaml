@@ -3,12 +3,12 @@ builders:
     import: "package:dartboot_core/builder/boot_builder.dart" # 这里请使用pubspec.yaml中的name替换'dartboot'
     builder_factories: ["scan"]
     build_extensions: { ".dart": [".g.dart"] }
-    auto_apply: root_package
+    auto_apply: all_packages
     build_to: cache
     runs_before: ['write_builder']
   write_builder: # 引入注解的类，输出dart文件
     import: "package:dartboot_core/builder/boot_builder.dart" # 这里请使用pubspec.yaml中的name替换'dartboot'
     builder_factories: ["write"]
     build_extensions: { ".dart": [".g.dart"] }
-    auto_apply: root_package
+    auto_apply: all_packages
     build_to: source

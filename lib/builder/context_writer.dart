@@ -1,9 +1,9 @@
 import 'package:analyzer/dart/element/element.dart';
 import 'package:build/build.dart';
 import 'package:build/src/builder/build_step.dart';
+import 'package:dartboot_annotation/dartboot_annotation.dart';
 import 'package:source_gen/source_gen.dart';
 
-import '../annotation/annotation.dart';
 import 'scanner.dart';
 
 /// [BuildContext] dart文件的编写器
@@ -13,17 +13,17 @@ import 'scanner.dart';
 /// @Author luodongseu
 class ContextWriter extends GeneratorForAnnotation<BootContext> {
   @override
-  generateForAnnotatedElement(
+  String generateForAnnotatedElement(
       Element element, ConstantReader annotation, BuildStep buildStep) {
     buildStep.inputId.changeExtension('.g.dart');
     final source = element.librarySource ?? element.source;
     if (null != source && !source.isInSystemLibrary) {
-      StringBuffer buffer =
-          StringBuffer('/// This is auto import holder file!!!\r\n');
-      StringBuffer loadLibraryLines = StringBuffer('');
+      var buffer =
+          StringBuffer('/// This is auto import holder file: ${Scanner.annotationUris.length} ${Scanner.annotationUris}!!!\r\n');
+      var loadLibraryLines = StringBuffer('');
       buffer.writeln('');
       buffer.writeln('');
-      for (int i = 0; i < Scanner.annotationUris.length; i++) {
+      for (var i = 0; i < Scanner.annotationUris.length; i++) {
         final ai = Scanner.annotationUris[i];
         buffer.writeln('import "$ai" deferred as clz$i;');
         loadLibraryLines.writeln('await clz$i.loadLibrary();');

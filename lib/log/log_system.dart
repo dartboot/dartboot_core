@@ -3,10 +3,9 @@ import 'dart:collection';
 import 'dart:io';
 import 'dart:isolate';
 
+import 'package:dartboot_util/dartboot_util.dart';
 import 'package:logging/logging.dart';
 
-import '../util/date.dart';
-import '../util/string.dart';
 import 'logger.dart';
 import 'fragment.dart';
 

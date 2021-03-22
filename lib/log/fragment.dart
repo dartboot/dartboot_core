@@ -1,8 +1,7 @@
+import 'package:dartboot_util/dartboot_util.dart';
 import 'package:logging/logging.dart';
 
 import '../bootstrap/application_context.dart';
-import '../util/date.dart';
-import '../util/string.dart';
 
 /// 日志片段
 class LogFragment {
@@ -59,7 +58,7 @@ class LogFragment {
     if (level == Level.OFF) {
       return message ?? '';
     }
-    String result =
+    var result =
         '[${formatTime(DateTime.now())} :${profile ?? '--'}:${port ?? '--'}:] [U:${userId ?? ''} T:${traceId ?? ''}] [${level.name}] $loggerName: $message';
     if (isNotEmpty(error)) {
       result += '\n';

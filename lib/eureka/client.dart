@@ -1,13 +1,11 @@
 import 'dart:async';
 
+import 'package:dartboot_util/dartboot_util.dart';
 import 'package:dio/dio.dart';
 
 import '../bootstrap/application_context.dart';
 import '../error/custom_error.dart';
 import '../log/logger.dart';
-import '../util/ipaddress.dart';
-import '../util/string.dart';
-import '../util/uid.dart';
 import 'instance.dart';
 
 /// 心跳间隔时间

@@ -1,10 +1,8 @@
 import 'dart:async';
 
-import 'package:analyzer/dart/element/element.dart';
 import 'package:build/build.dart';
+import 'package:dartboot_annotation/dartboot_annotation.dart';
 import 'package:source_gen/source_gen.dart';
-
-import '../annotation/annotation.dart';
 
 /// [RestController]Rest API控制器的扫描器
 const TypeChecker restControllerChecker =
@@ -24,15 +22,14 @@ const supportCheckers = [restControllerChecker, beanControllerChecker];
 /// @author luodongseu
 class Scanner implements Generator {
   /// 注解扫描到的全部dart文件的路径
-  static Set<String> _annotationUris = Set();
+  static final Set<String> _annotationUris = {};
 
   static List<String> get annotationUris => List.from(_annotationUris);
 
-  SGenerator(Map options) {}
-
   @override
   FutureOr<String> generate(LibraryReader library, BuildStep buildStep) {
-    for (ClassElement clazz in library.classes) {
+    for (var clazz in library.classes) {
+      print('Handle $clazz...');
       // 扫描注解类
       if (supportCheckers.any((c) => c.hasAnnotationOf(clazz))) {
         final source = clazz.librarySource ?? clazz.source;

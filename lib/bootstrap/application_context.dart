@@ -4,16 +4,14 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:mirrors';
 
-import 'package:logging/logging.dart';
+import 'package:dartboot_annotation/dartboot_annotation.dart';
+import 'package:dartboot_util/dartboot_util.dart';
 import 'package:yaml/yaml.dart';
 import '../error/custom_error.dart';
 import '../eureka/eureka.dart';
 import '../log/log_system.dart';
 import '../log/logger.dart';
 import '../server/server.dart';
-import '../util/string.dart';
-import '../annotation/annotation.dart';
-import './application_context.g.dart' deferred as gContext;
 
 typedef ExitEvent = Function();
 
@@ -27,7 +25,6 @@ typedef ExitEvent = Function();
 /// @启动Eureka客户端
 ///
 /// @author luodongseu
-@BootContext()
 class ApplicationContext {
   Log logger = Log('DartBootApplication');
 
@@ -53,7 +50,7 @@ class ApplicationContext {
   List<Completer> _starters = [];
 
   /// 系统退出监听器器
-  List<ExitEvent> _exitListeners = [];
+  final List<ExitEvent> _exitListeners = [];
 
   /// 是否正在退出
   bool _exiting = false;
@@ -87,9 +84,9 @@ class ApplicationContext {
   /// 获取全局配置操作
   dynamic operator [](String key) {
     if (key.contains('.')) {
-      List<String> _keys = key.split('.');
+      var _keys = key.split('.');
       dynamic result = _properties;
-      for (int i = 0; i < _keys.length; i++) {
+      for (var i = 0; i < _keys.length; i++) {
         var _r = result[_keys[i]];
         if (null == _r) {
           return null;
@@ -104,7 +101,7 @@ class ApplicationContext {
   }
 
   /// 关闭应用
-  stop() {
+  void stop() {
     _starters = [];
     _exitListeners.forEach((f) => f());
   }
@@ -112,13 +109,13 @@ class ApplicationContext {
   /// 初始化操作
   ///
   /// 请在[main.dart]中调用该方法启动DartBoot应用
-  initialize({bool reload = false}) async {
+  void initialize({bool reload = false}) async {
     // 加载配置文件
     _loadProperties(propertiesFilePath: _configFilePath ?? 'config.yaml');
 
     if (!reload) {
       // 初始化日志系统
-      Level rootLogLevel = INFO;
+      var rootLogLevel = INFO;
       String _rootLogLevel = this['logging.root'];
       switch (_rootLogLevel?.toUpperCase()) {
         case 'DEBUG':
@@ -164,19 +161,19 @@ class ApplicationContext {
   }
 
   /// 加载配置文件
-  _loadProperties({String propertiesFilePath}) {
+  void _loadProperties({String propertiesFilePath}) {
     assert(isNotEmpty(propertiesFilePath), '配置文件路径不能为空');
 
     // 处理特殊参数
-    Map<String, Object> runArgsMap = _parseRunArgs2Properties();
+    var runArgsMap = _parseRunArgs2Properties();
     print('Run args: $runArgsMap.');
 
     // 完整路径
-    String fullPath = '$_rootPath/resource/$propertiesFilePath';
+    var fullPath = '$_rootPath/resource/$propertiesFilePath';
     print('Config file is: $fullPath.');
 
     // Bcz log system not initialize
-    File file = File(fullPath);
+    var file = File(fullPath);
     if (null != file && file.existsSync()) {
       // 读取基本配置文件
       YamlMap yaml = loadYaml(file.readAsStringSync());
@@ -188,8 +185,11 @@ class ApplicationContext {
       }
 
       // 读取profile对应的配置文件
+      if (isEmpty(_properties['profile'])) {
+        _properties['profile'] = {};
+      }
       if (isNotEmpty(activeProfile)) {
-        File profileFile = File(
+        var profileFile = File(
             fullPath.replaceFirst(RegExp('.yaml\$'), '-$activeProfile.yaml'));
         if (file.existsSync()) {
           print('Profile config file is: ${profileFile.path}.');
@@ -197,10 +197,6 @@ class ApplicationContext {
           profileYaml.entries.forEach((e) {
             _properties['${e.key}'] = json.decode(json.encode(e.value));
           });
-        }
-
-        if (isEmpty(_properties['profile'])) {
-          _properties['profile'] = {};
         }
         _properties['profile']['active'] = activeProfile;
       }
@@ -227,12 +223,12 @@ class ApplicationContext {
 
   /// 处理脚本启动参数
   Map<String, Object> _parseRunArgs2Properties() {
-    Map<String, Object> argsMap = {};
+    var argsMap = <String, Object>{};
     // 端口号
-    String portArg = runArgs.firstWhere((arg) => '$arg'.startsWith('-Dport='),
+    var portArg = runArgs.firstWhere((arg) => '$arg'.startsWith('-Dport='),
         orElse: () => null);
     if (isNotEmpty(portArg)) {
-      String port = portArg.replaceFirst('-Dport=', '');
+      var port = portArg.replaceFirst('-Dport=', '');
       if (!RegExp(r'^[1-9][0-9]{3,}$').hasMatch(port)) {
         throw CustomError('启动的端口配置错误');
       }
@@ -240,11 +236,11 @@ class ApplicationContext {
     }
 
     // profile
-    String profileArg = runArgs.firstWhere(
+    var profileArg = runArgs.firstWhere(
         (arg) => '$arg'.startsWith('-Dprofile.active='),
         orElse: () => null);
     if (isNotEmpty(profileArg)) {
-      String profile = profileArg.replaceFirst('-Dprofile.active=', '');
+      var profile = profileArg.replaceFirst('-Dprofile.active=', '');
       if (isEmpty(profile)) {
         throw CustomError('启动的Profile配置错误');
       }
@@ -252,11 +248,11 @@ class ApplicationContext {
     }
 
     // eureka zone
-    String eurekaZoneArg = runArgs.firstWhere(
+    var eurekaZoneArg = runArgs.firstWhere(
         (arg) => '$arg'.startsWith('-Derueka.zone='),
         orElse: () => null);
     if (isNotEmpty(eurekaZoneArg)) {
-      String eurekaZone = eurekaZoneArg.replaceFirst('-Derueka.zone=', '');
+      var eurekaZone = eurekaZoneArg.replaceFirst('-Derueka.zone=', '');
       if (isEmpty(eurekaZone)) {
         throw CustomError('启动的Erueka Zone配置错误');
       }
@@ -267,7 +263,7 @@ class ApplicationContext {
   }
 
   /// 初始化系统进程关闭监听
-  _listenSystemExit() {
+  void _listenSystemExit() {
     // Ctrl+C handler.
     ProcessSignal.sigint.watch().listen((_) async {
       if (_exiting) {
@@ -287,13 +283,10 @@ class ApplicationContext {
   }
 
   /// 扫描带注解的所有dart类
-  _scanAnnotatedClasses() async {
+  void _scanAnnotatedClasses() async {
     // 1. Create BuildContext instance which created by build_runner
     // Dynamic import all controller classes
     logger.info('Start to scan annotated classes in application...');
-
-    await gContext.loadLibrary();
-    gContext.BuildContext();
     logger.info('Dynamic class -> [BuildContext] loaded.');
 
     // 所有的镜像
@@ -306,32 +299,33 @@ class ApplicationContext {
   ///
   /// 暂时只支持[RestController]、[Bean]注解
   void _loadAllAnnotatedMirrors() {
-    Map<String, InstanceMirror> _allBeanInstanceMirrors = {};
-    List<InstanceMirror> _allControllerInstanceMirrors = [];
+    var _allBeanInstanceMirrors = <String, InstanceMirror>{};
+    var _allControllerInstanceMirrors = <InstanceMirror>[];
 
     // 是否为合法的对象
     bool isLegalMirror(InstanceMirror m) {
-      return  m.hasReflectee &&
+      return m.hasReflectee &&
           (m.reflectee is RestController || m.reflectee is Bean);
     }
-       
-    Queue<ClassMirror> classMirrors = Queue();
+
+    var classMirrors = Queue<ClassMirror>();
     currentMirrorSystem().libraries.values.forEach((lm) {
+      print('LM: $lm');
       lm.declarations.values.forEach((dm) {
         if (dm is ClassMirror && dm.metadata.any((m) => isLegalMirror(m))) {
           classMirrors.add(dm);
         }
       });
     });
-    int retry = classMirrors.length;
+    var retry = classMirrors.length;
     while (classMirrors.isNotEmpty) {
       assert(retry >= 0, 'Retry annotated mirrors failed!');
 
-      ClassMirror dm = classMirrors.removeFirst();
-      bool isBean = dm.metadata.any((m) => m.reflectee is Bean);
+      var dm = classMirrors.removeFirst();
+      var isBean = dm.metadata.any((m) => m.reflectee is Bean);
       if (isBean) {
         // bean
-        Bean b = dm.metadata
+        var b = dm.metadata
             .firstWhere((element) => element.reflectee is Bean)
             .reflectee as Bean;
         // 注入条件
@@ -340,14 +334,14 @@ class ApplicationContext {
           continue;
         }
         // 实例名称
-        String beanName = dm.toString();
+        var beanName = dm.toString();
         if (isNotEmpty(b.name)) {
           beanName = b.name;
         }
         // 依赖检查
         if (isNotEmpty(b.dependencies)) {
           // 检查是否有依赖项未添加
-          bool hasNotInjectedDep = b.dependencies
+          var hasNotInjectedDep = b.dependencies
               .any((element) => !_allBeanInstanceMirrors.containsKey(element));
           if (hasNotInjectedDep) {
             classMirrors.addLast(dm);
@@ -380,15 +374,15 @@ class ApplicationContext {
   }
 
   /// 加载所有的注解了[RestController]的实例
-  _handleRestControllers(List<InstanceMirror> mirrors) {
+  void _handleRestControllers(List<InstanceMirror> mirrors) {
     mirrors.forEach((im) {
-      bool hasAnn = im.type.metadata.any((m) => m.reflectee is RestController);
+      var hasAnn = im.type.metadata.any((m) => m.reflectee is RestController);
       if (hasAnn) {
-        RestController rc = im.type.metadata
+        var rc = im.type.metadata
             .singleWhere((m) => m.reflectee is RestController)
             .reflectee as RestController;
         // 处理RestController基础的路由
-        String bp = rc.basePath ?? '/';
+        var bp = rc.basePath ?? '/';
         if (!bp.startsWith('/')) {
           bp = '/' + bp;
         }
@@ -396,13 +390,13 @@ class ApplicationContext {
       }
     });
     logger.info(
-        "RestController scan finished. Total ${_controllers.length} controllers.");
+        'RestController scan finished. Total ${_controllers.length} controllers.');
     _controllers.forEach(
-        (c) => logger.info("RestController: ${c.type.simpleName} registered."));
+        (c) => logger.info('RestController: ${c.type.simpleName} registered.'));
   }
 
   /// 开启http服务
-  _startServer() async {
+  void _startServer() async {
     if (null != _server) {
       _server.reload(_controllers);
       return;

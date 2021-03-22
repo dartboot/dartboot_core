@@ -1,3 +1,16 @@
+## 1.0.9 
+1.0.5 -> 1.0.9
+
+- Update build config
+
+## 1.0.4
+
+- Change build_runner `auto_apply` strategy to `all_packages`
+
+## 1.0.3
+
+- Remove some codes to dependencies.
+
 ## 1.0.2
 
 - Change author
