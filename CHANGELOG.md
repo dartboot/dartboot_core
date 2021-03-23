@@ -1,3 +1,7 @@
+## 1.0.12
+
+- Update bean injection error message
+
 ## 1.0.9 
 1.0.5 -> 1.0.9
 

@@ -29,12 +29,12 @@ class Scanner implements Generator {
   @override
   FutureOr<String> generate(LibraryReader library, BuildStep buildStep) {
     for (var clazz in library.classes) {
-      print('Handle $clazz...');
       // 扫描注解类
       if (supportCheckers.any((c) => c.hasAnnotationOf(clazz))) {
         final source = clazz.librarySource ?? clazz.source;
         if (null != source && !source.isInSystemLibrary) {
-          _annotationUris.add(source.uri.toString());
+          print(library.pathToUrl(source.uri));
+          _annotationUris.add(library.pathToUrl(source.uri).toString());
         }
       }
     }

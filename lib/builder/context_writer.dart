@@ -11,7 +11,7 @@ import 'scanner.dart';
 /// 该Writer会扫描注解为BootContext的dart文件，然后创建一个.g.dart文件
 ///
 /// @Author luodongseu
-class ContextWriter extends GeneratorForAnnotation<BootContext> {
+class ContextWriter extends GeneratorForAnnotation<DartBootApplication> {
   @override
   String generateForAnnotatedElement(
       Element element, ConstantReader annotation, BuildStep buildStep) {

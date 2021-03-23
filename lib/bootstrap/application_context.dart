@@ -71,10 +71,9 @@ class ApplicationContext {
 
   List<String> get runArgs => _runArgs;
 
-  ApplicationContext(
-      {configFilePath = 'config.yaml',
-      String rootPath = '.',
-      List<String> runArgs}) {
+  ApplicationContext({configFilePath = 'config.yaml',
+    String rootPath = '.',
+    List<String> runArgs}) {
     _configFilePath = configFilePath;
     _rootPath = rootPath ?? '.';
     _runArgs = runArgs ?? [];
@@ -237,7 +236,7 @@ class ApplicationContext {
 
     // profile
     var profileArg = runArgs.firstWhere(
-        (arg) => '$arg'.startsWith('-Dprofile.active='),
+            (arg) => '$arg'.startsWith('-Dprofile.active='),
         orElse: () => null);
     if (isNotEmpty(profileArg)) {
       var profile = profileArg.replaceFirst('-Dprofile.active=', '');
@@ -249,7 +248,7 @@ class ApplicationContext {
 
     // eureka zone
     var eurekaZoneArg = runArgs.firstWhere(
-        (arg) => '$arg'.startsWith('-Derueka.zone='),
+            (arg) => '$arg'.startsWith('-Derueka.zone='),
         orElse: () => null);
     if (isNotEmpty(eurekaZoneArg)) {
       var eurekaZone = eurekaZoneArg.replaceFirst('-Derueka.zone=', '');
@@ -310,7 +309,6 @@ class ApplicationContext {
 
     var classMirrors = Queue<ClassMirror>();
     currentMirrorSystem().libraries.values.forEach((lm) {
-      print('LM: $lm');
       lm.declarations.values.forEach((dm) {
         if (dm is ClassMirror && dm.metadata.any((m) => isLegalMirror(m))) {
           classMirrors.add(dm);
@@ -318,8 +316,14 @@ class ApplicationContext {
       });
     });
     var retry = classMirrors.length;
+    var exception = '';
     while (classMirrors.isNotEmpty) {
-      assert(retry >= 0, 'Retry annotated mirrors failed!');
+      var assetMsg = isNotEmpty(exception)
+          ? exception
+          : 'Retry annotated mirrors failed!';
+      if (retry < 0) {
+        throw CustomError(assetMsg);
+      }
 
       var dm = classMirrors.removeFirst();
       var isBean = dm.metadata.any((m) => m.reflectee is Bean);
@@ -352,6 +356,7 @@ class ApplicationContext {
         try {
           _allBeanInstanceMirrors[beanName] = dm.newInstance(Symbol.empty, []);
         } catch (e) {
+          exception = e is AssertionError ? e.message : e.toString();
           classMirrors.addLast(dm);
           retry--;
           continue;
@@ -390,9 +395,11 @@ class ApplicationContext {
       }
     });
     logger.info(
-        'RestController scan finished. Total ${_controllers.length} controllers.');
+        'RestController scan finished. Total ${_controllers
+            .length} controllers.');
     _controllers.forEach(
-        (c) => logger.info('RestController: ${c.type.simpleName} registered.'));
+            (c) =>
+            logger.info('RestController: ${c.type.simpleName} registered.'));
   }
 
   /// 开启http服务

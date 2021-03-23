@@ -6,7 +6,7 @@ void main() {
 
 
     setUp(() {
-      DartBootApplication.run();
+      DartBoot.run();
     });
 
     test('First Test', () {
