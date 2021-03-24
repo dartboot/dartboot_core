@@ -36,16 +36,16 @@ class ContextWriter extends GeneratorForAnnotation<DartBootApplication> {
       }
       buffer.writeln('');
       buffer.writeln('');
-      buffer.writeln('/// Empty class [BuildContext] to import to main '
+      buffer.writeln('/// Empty class [DartBootInitializer] to import to main '
           'isolate');
       buffer.writeln('/// ');
-      buffer.writeln('/// Builer created automaticly');
+      buffer.writeln('/// Created by build_runner and source_gen');
       // class start
       buffer.writeln('class DartBootInitializer {');
 
       // load function start
       buffer.writeln('/// [load] function to load all annotated dart files');
-      buffer.writeln('AutoImportBuilder() {');
+      buffer.writeln('DartBootInitializer() {');
       buffer.write(loadLibraryLines.toString());
       // load function end
       buffer.writeln('}');
@@ -56,7 +56,7 @@ class ContextWriter extends GeneratorForAnnotation<DartBootApplication> {
       // class init segment
       buffer.writeln('');
       buffer.writeln('/// Load constructor to load packages');
-      buffer.writeln('var _ = DartBootInitializer();');
+      buffer.writeln('var i = DartBootInitializer();');
       buffer.writeln('');
       buffer.writeln('/// File end');
 
