@@ -1,3 +1,7 @@
+## 1.0.13
+
+- Update build runner script to generate more simple code
+
 ## 1.0.12
 
 - Update bean injection error message

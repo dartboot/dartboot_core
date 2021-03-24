@@ -1,6 +1,6 @@
 name: dartboot_core
 description: The core library for DartBoot framework. https://github.com/luodongseu/dartboot.
-version: 1.0.9
+version: 1.0.13
 homepage: https://github.com/luodongseu/dartboot_core
 
 environment:

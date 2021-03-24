@@ -12,21 +12,27 @@ import 'scanner.dart';
 ///
 /// @Author luodongseu
 class ContextWriter extends GeneratorForAnnotation<DartBootApplication> {
+  static bool initializerLoaded = false;
+
   @override
   String generateForAnnotatedElement(
       Element element, ConstantReader annotation, BuildStep buildStep) {
+    if (initializerLoaded) {
+      return '';
+    }
+
     buildStep.inputId.changeExtension('.g.dart');
     final source = element.librarySource ?? element.source;
     if (null != source && !source.isInSystemLibrary) {
-      var buffer =
-          StringBuffer('/// This is auto import holder file: ${Scanner.annotationUris.length} ${Scanner.annotationUris}!!!\r\n');
+      var buffer = StringBuffer(
+          '/// This is auto import holder file: ${Scanner.annotationUris.length} ${Scanner.annotationUris}!!!\r\n');
       var loadLibraryLines = StringBuffer('');
       buffer.writeln('');
       buffer.writeln('');
       for (var i = 0; i < Scanner.annotationUris.length; i++) {
         final ai = Scanner.annotationUris[i];
         buffer.writeln('import "$ai" deferred as clz$i;');
-        loadLibraryLines.writeln('await clz$i.loadLibrary();');
+        loadLibraryLines.writeln('clz$i.loadLibrary();');
       }
       buffer.writeln('');
       buffer.writeln('');
@@ -35,20 +41,31 @@ class ContextWriter extends GeneratorForAnnotation<DartBootApplication> {
       buffer.writeln('/// ');
       buffer.writeln('/// Builer created automaticly');
       // class start
-      buffer.writeln('class BuildContext {');
+      buffer.writeln('class DartBootInitializer {');
 
       // load function start
       buffer.writeln('/// [load] function to load all annotated dart files');
-      buffer.writeln('void load() async {');
+      buffer.writeln('AutoImportBuilder() {');
       buffer.write(loadLibraryLines.toString());
       // load function end
       buffer.writeln('}');
 
       // class end
       buffer.writeln('}');
+
+      // class init segment
+      buffer.writeln('');
+      buffer.writeln('/// Load constructor to load packages');
+      buffer.writeln('var _ = DartBootInitializer();');
+      buffer.writeln('');
+      buffer.writeln('/// File end');
+
+      // Set loaded
+      initializerLoaded = true;
+
       return buffer.toString();
     }
     // 出错了
-    throw ArgumentError('ApplicationContext not found!');
+    throw ArgumentError('DartBootInitializer not found!');
   }
 }
